@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Article;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,6 +40,42 @@ class ArticleRepository extends ServiceEntityRepository
         }
     }
 
+    public function getLastCommitedArticles(int $maxResult = 15)
+    {
+        $query = $this->createQueryBuilder('a')
+            ->join('a.comments', 'c')
+            ->addSelect('c')
+            ->orderBy('c.dateComment', 'DESC')
+            ->setMaxResults($maxResult)
+            ->distinct()
+            ->getQuery();
+        return $query
+            ->getResult()
+        ;
+    }
+
+    public function getLastArticles(int $maxResult = 15)
+    {
+        return $this->createQueryBuilder('a')
+            ->orderBy('a.dateCreation', 'DESC')
+            ->setMaxResults($maxResult)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getArticlesPagination(
+        int $page = 1,
+        int $nbPerPage = 20
+    )
+    {
+        $firstElement = ($page - 1) * $nbPerPage;
+        $query = $this->createQueryBuilder('a')
+            ->setFirstResult($firstElement)
+            ->setMaxResults($nbPerPage)
+            ->getQuery();
+        return new Paginator($query, true);
+    }
 //    /**
 //     * @return Article[] Returns an array of Article objects
 //     */

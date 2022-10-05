@@ -16,7 +16,7 @@ class CommentType extends AbstractType
             ->add('contenu', null, [
                 'label' => "Votre commentaire"
             ])
-            ->add('author', null, [
+            ->add('auteur', null, [
                 'label' => "Votre nom (pseudo)"
             ])
             ->add('condition', CheckboxType::class, [

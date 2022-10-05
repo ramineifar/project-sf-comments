@@ -19,7 +19,7 @@ class ArticleFixtures extends Fixture
     {
         for($i = 1; $i <= 30;$i++){
             $article = new Article();
-            $article->setTitre($this->faker->text(50) . '(' . $i . ')');
+            $article->setTitre($this->faker->text(50));
             $article->setContenu($this->faker->paragraphs(5, true));
 
             $date = new \DateTime();

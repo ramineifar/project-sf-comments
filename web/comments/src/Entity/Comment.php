@@ -38,6 +38,11 @@ class Comment
      */
     private $article;
 
+    public function __construct()
+    {
+        $this->setDateComment(new \DateTimeImmutable());
+    }
+
     public function getId(): ?int
     {
         return $this->id;
