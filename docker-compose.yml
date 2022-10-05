@@ -1,0 +1,55 @@
+version: "3"
+
+services:
+  symfony:
+    container_name: php
+    build:
+      context: .
+      dockerfile: ./tools/docker/php/Dockerfile
+    environment: # We set some environments variables to facilitate debug
+      APP_ENV: dev
+      APP_DEBUG: 1
+      DEV_UID: ${UID}
+    expose:
+      - 9000
+      - 9088
+    env_file:
+      - ${WORKSPACE}.env
+    volumes:
+      - ./web:/var/www/html # It has to match with the WORKDIR inside the docker file
+    networks:
+      - symfony # Still same network
+
+  symfony_db:
+    build:
+      context: .
+      dockerfile: ./tools/docker/postgresql/Dockerfile
+    container_name: db
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      TCP_PORTS: 5432
+      POSTGRES_USER: postgresql
+      POSTGRES_PASSWORD: postgresql
+      POSTGRES_DB: symfony
+    volumes:
+      - ./tools/docker/postgresql/data:/var/lib/postgresql/data:rw
+    networks:
+      - symfony
+    ports:
+      - "5432:5432"
+
+  symfony_nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./tools/docker/nginx/Dockerfile
+    ports:
+      - 8080:80 # Redirect Docker port 80 to localhost port 8080. So you'll access to Nginx with localhost:8080
+      - 8088:88 # Redirect Docker port 81 to localhost port 8081. So you'll access to Nginx with localhost:8081
+    volumes:
+      - ./tools/docker/nginx/config:/etc/nginx/conf.d
+    networks:
+      - symfony
+
+networks:
+  symfony: {}
